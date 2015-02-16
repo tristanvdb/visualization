@@ -1,0 +1,118 @@
+
+<html>
+  <meta charset="utf-8">
+  <head>
+    <title>AST Visualization</title>
+
+    <link rel="stylesheet" type="text/css" href="ast-viz.css">
+
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+    <script type='text/javascript' src="https://raw.githubusercontent.com/ajaxorg/ace-builds/master/src-noconflict/ace.js"></script>
+
+    <script type="text/javascript" src="../ressources/svg-pan-zoom.min.js"></script>
+    <script type="text/javascript" src="../ressources/viz.js"></script>
+    <script type="text/javascript" src="../ressources/dagre-d3.min.js"></script>
+
+    <script type="text/javascript" src="../scripts/php-wrapper.js"></script>
+    <script type="text/javascript" src="../scripts/dagre-rendering.js"></script>
+    <script type="text/javascript" src="../scripts/graphviz-rendering.js"></script>
+  </head>
+  <body>
+<div class="frame cmd-frame">
+  <div class="box cmd-box">
+    <div class="border">
+      <div class="row">
+        <span>Load file:</span>
+        <input id="file-load" type="file"></input>
+      </div>
+      <div class="row">
+        <span>Working directory:</span>
+        <input id="file-dir" value="project"></input>
+      </div>
+      <div class="row">
+        <span>File name:</span>
+        <input id="file-name" value="test"></input>
+      </div>
+      <div class="row">
+        <span>File type:</span>
+        <select id="file-type">
+          <option value="c" selected>c</option>
+          <option value="h"         >h</option>
+          <option value="cpp"       >cpp</option>
+          <option value="hpp"       >hpp</option>
+          <option value="tpp"       >tpp</option>
+          <option value="cxx"       >cxx</option>
+        </select>
+      </div>
+      <div class="row">
+        <div align="right">
+          <button id="file-save">Save on server</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="box cmd-box">
+    <div class="border">
+      <div class="row">
+        <span>Visualization:</span>
+        <select id="viz-traversal">
+          <option value="blank" selected>Empty boxes</option>
+          <option value="default">AST with color and layout</option>
+          <option value="programmable">Programmable using JSON</option>
+        </select>
+      </div>
+      <div class="row">
+        <span>Viz Program:</span>
+        <input id="program"></input>
+      </div>
+      <div class="row">
+        <span>Output Format:</span>
+        <select id="viz-format">
+          <option value="json" selected>JSON</option>
+          <option value="graphviz">GraphViz</option>
+        </select>
+      </div>
+      <div class="row" align="right">
+        <button id="viz-generate">Generate Viz</button>
+      </div>
+    </div>
+  </div>
+  <div class="box cmd-box">
+    <div class="border">
+      <div class="row">
+        <span>Compiler options:</span>
+      </div>
+      <div class="row">
+        <textarea id="options">-DSKIP_ROSE_BUILTIN_DECLARATIONS</textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="frame pan-frame">
+  <div class="box pan-box">
+    <div class="border">
+        <div id="editor"></div>
+    </div>
+  </div>
+  <div class="box pan-box">
+    <div class="border">
+        <div id="viz"><svg><g></g></svg></div>
+    </div>
+  </div>
+</div>
+
+<div class="frame dbg-frame">
+  <div class="box dbg-box">
+    <div class="border">
+      <textarea id="debug"></textarea>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="ast-viz.js"></script>
+  </body>
+</html>
+

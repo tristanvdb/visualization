@@ -1,0 +1,58 @@
+
+<html>
+  <meta charset="utf-8">
+  <head>
+    <title>GraphViz Visualization</title>
+
+    <link rel="stylesheet" type="text/css" href="graphviz-display.css">
+
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+    <script type="text/javascript" src="../ressources/svg-pan-zoom.min.js"></script>
+    <script type="text/javascript" src="../ressources/viz.js"></script>
+
+    <script type="text/javascript" src="../scripts/graphviz-rendering.js"></script>
+  </head>
+
+  <body>
+<div class="frame cmd-frame">
+  <div class="box cmd-box">
+    <div class="border">
+      <div class="row">
+        <div align="center">Load GraphViz: <input type="file" id="file-load" /></div>
+      </div>
+    </div>
+  </div>
+  <div class="box cmd-box">
+    <div class="border">
+      <div class="row">
+        <div align="center"><button id="viz-generate">Generate Viz</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="frame pan-frame">
+  <div class="box pan-box">
+    <div class="border">
+        <textarea id="editor"></textarea>
+    </div>
+  </div>
+  <div class="box pan-box">
+    <div class="border">
+        <div id="viz"><svg><g></g></svg></div>
+    </div>
+  </div>
+</div>
+
+<div class="frame dbg-frame">
+  <div class="box dbg-box">
+    <div class="border">
+      <textarea id="debug"></textarea>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="graphviz-display.js"></script>
+  </body>
+</html>

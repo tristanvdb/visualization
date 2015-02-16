@@ -1,0 +1,68 @@
+
+<html>
+  <meta charset="utf-8">
+  <head>
+    <title>ASM Graphs Visualization</title>
+
+    <link rel="stylesheet" type="text/css" href="asm-viz.css">
+
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+    <script type="text/javascript" src="../ressources/dagre-d3.js"></script>
+
+    <script type="text/javascript" src="../scripts/php-wrapper.js"></script>
+    <script type="text/javascript" src="../scripts/dagre-rendering.js"></script>
+  </head>
+  <body>
+<div class="frame cmd-frame">
+  <div class="box cmd-box">
+    <div class="border">
+      <div class="row">
+        <span>ASM:</span>
+        <select id="file">
+          <option value="test"                 selected>test</option>
+          <option value="0A32eTdBKayjCWhZqDOQ"         >0A32eTdBKayjCWhZqDOQ</option>
+          <option value="0ACDbR5M3ZhBJajygTuf"         >0ACDbR5M3ZhBJajygTuf</option>
+        </select>
+        <button id="generate-cg">Generate</button>
+      </div>
+    </div>
+  </div>
+  <div class="box cmd-box">
+    <div class="border">
+      <div class="row">
+        <span>Routine:</span>
+        <select id="routine">
+        </select>
+        <button id="generate-cfg">Generate</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="frame pan-frame">
+  <div class="box pan-box">
+    <div class="border">
+        <div id="cgviz"><svg><g></g></svg></div>
+    </div>
+  </div>
+  <div class="box pan-box">
+    <div class="border">
+        <div id="cfgviz"><svg><g></g></svg></div>
+    </div>
+  </div>
+</div>
+
+<div class="frame dbg-frame">
+  <div class="box dbg-box">
+    <div class="border">
+      <textarea id="debug"></textarea>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="asm-viz.js"></script>
+  </body>
+</html>
+

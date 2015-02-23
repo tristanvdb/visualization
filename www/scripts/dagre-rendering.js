@@ -1,5 +1,90 @@
 
-function render_JSON(text, selector, graph_builder) {
+// Whole graph is visible
+function set_max_hw_margin(viz, graph) {
+  var margin = 20;
+  var width_ratio  = viz.node().getBoundingClientRect().width  / (graph.width  + 2 * margin + 100);
+  var height_ratio = viz.node().getBoundingClientRect().height / (graph.height + 2 * margin + 100);
+
+  var scale = 1;
+  var hmargin = 0;
+  var vmargin = 0;
+  if (width_ratio < height_ratio) {
+    scale = width_ratio;
+    hmargin = margin;
+    vmargin = (viz.node().getBoundingClientRect().height - scale * (graph.height  + 2 * margin + 100))/2;
+  }
+  else {
+    scale = height_ratio;
+    hmargin = (viz.node().getBoundingClientRect().width - scale * (graph.width  + 2 * margin + 100))/2;
+    vmargin = margin;
+  }
+
+  return {"hmargin":hmargin, "vmargin":vmargin, "scale":scale};
+}
+
+// Smallest dimension is visible
+function set_min_hw_margin(viz, graph) {
+  var margin = 20;
+  var width_ratio  = viz.node().getBoundingClientRect().width  / (graph.width  + 2 * margin + 100);
+  var height_ratio = viz.node().getBoundingClientRect().height / (graph.height + 2 * margin + 100);
+
+  var scale = 1;
+  var hmargin = 0;
+  var vmargin = 0;
+  if (width_ratio > height_ratio) {
+    scale = width_ratio;
+    hmargin = margin;
+    vmargin = (viz.node().getBoundingClientRect().height - scale * (graph.height  + 2 * margin + 100))/2;
+  }
+  else {
+    scale = height_ratio;
+    hmargin = (viz.node().getBoundingClientRect().width - scale * (graph.width  + 2 * margin + 100))/2;
+    vmargin = margin;
+  }
+
+  return {"hmargin":hmargin, "vmargin":vmargin, "scale":scale};
+}
+
+function set_h_margin(viz, graph) {
+  var margin = 20;
+  var height_ratio = viz.node().getBoundingClientRect().height / (graph.height + 2 * margin + 100);
+
+  var scale = height_ratio;
+  var hmargin = (viz.node().getBoundingClientRect().width - scale * (graph.width  + 2 * margin + 100))/2;
+  var vmargin = margin;
+
+  return {"hmargin":hmargin, "vmargin":vmargin, "scale":scale};
+}
+
+function set_w_margin(viz, graph) {
+  var margin = 20;
+  var width_ratio  = viz.node().getBoundingClientRect().width  / (graph.width  + 2 * margin + 100);
+
+  var scale = width_ratio;
+  var hmargin = margin;
+  var vmargin = (viz.node().getBoundingClientRect().height - scale * (graph.height  + 2 * margin + 100))/2;
+
+  return {"hmargin":hmargin, "vmargin":vmargin, "scale":scale};
+}
+
+function default_set_zoom(viz, zoom_init) {
+  var svg = viz.select("svg");
+  var svg_inner_graph = svg.select("g");
+
+  var zoom = d3.behavior.zoom().on("zoom", function() {
+    svg_inner_graph.attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
+  });
+  svg.call(zoom);
+
+  zoom.translate([zoom_init.hmargin, zoom_init.vmargin])
+      .scale(zoom_init.scale)
+      .event(svg);
+}
+
+function render_JSON(text, selector, graph_builder, set_margin, set_zoom) {
+  if (!set_margin) set_margin = set_max_hw_margin;
+  if (!set_zoom) set_zoom = default_set_zoom;
+
   // Process input into a graph
 
   var in_graph = JSON.parse(text);
@@ -18,47 +103,9 @@ function render_JSON(text, selector, graph_builder) {
   var render = new dagreD3.render();
   render(svg_inner_graph, out_graph);
 
-  // Figure out initial scale and margin
+  set_zoom(viz, set_margin(viz, out_graph.graph()));
 
-  var margin = 20;
-  var width_ratio  = viz.node().getBoundingClientRect().width  / (out_graph.graph().width  + 2 * margin + 100);
-  var height_ratio = viz.node().getBoundingClientRect().height / (out_graph.graph().height + 2 * margin + 100);
-
-  var scale = 1;
-  var hmargin = 0;
-  var vmargin = 0;
-  if (width_ratio < height_ratio) {
-    scale = width_ratio;
-    hmargin = margin;
-    vmargin = (viz.node().getBoundingClientRect().height - scale * (out_graph.graph().height  + 2 * margin + 100))/2;
-  }
-  else {
-    scale = height_ratio;
-    hmargin = (viz.node().getBoundingClientRect().width - scale * (out_graph.graph().width  + 2 * margin + 100))/2;
-    vmargin = margin;
-  }
-
-/*document.getElementById("debug").value = document.getElementById("debug").value + "\n" +
-    "renderAST_JSON:\n\n" +
-    "  viz.width    = " + viz.node().getBoundingClientRect().width + "\n" +
-    "  viz.height   = " + viz.node().getBoundingClientRect().height + "\n" +
-    "  graph.width  = " + out_graph.graph().width + "\n" +
-    "  graph.height = " + out_graph.graph().height + "\n" +
-    "  width_ratio  = " + width_ratio + "\n" +
-    "  height_ratio = " + height_ratio + "\n\n" +
-    "  scale   = " + scale + "\n" +
-    "  hmargin = " + hmargin + "\n" +
-    "  vmargin = " + vmargin + "\n" +
-    "\n------------------------\n"; */
-
-  var zoom = d3.behavior.zoom().on("zoom", function() {
-    svg_inner_graph.attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
-  });
-  svg.call(zoom);
-
-  zoom.translate([hmargin, vmargin])
-      .scale(scale)
-      .event(svg);
+  return out_graph;
 }
 
 function renderAST_JSON(text, selector) {

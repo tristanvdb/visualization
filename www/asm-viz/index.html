@@ -6,10 +6,11 @@
 
     <link rel="stylesheet" type="text/css" href="asm-viz.css">
 
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-
+    <script type="text/javascript" src="../ressources/jquery.min.js"></script>
+    <script type="text/javascript" src="../ressources/d3.v3.min.js"></script>
     <script type="text/javascript" src="../ressources/dagre-d3.js"></script>
+
+    <script type='text/javascript' src="../ressources/ace.js"></script>
 
     <script type="text/javascript" src="../scripts/php-wrapper.js"></script>
     <script type="text/javascript" src="../scripts/dagre-rendering.js"></script>
@@ -42,12 +43,19 @@
 </div>
 
 <div class="frame pan-frame">
-  <div class="box pan-box">
+  <div class="box cg-box">
     <div class="border">
         <div id="cgviz"><svg><g></g></svg></div>
     </div>
   </div>
-  <div class="box pan-box">
+  <div class="box edit-box">
+    <div class="border">
+        <div id="editor"></div>
+    </div>
+  </div>
+</div>
+<div class="frame cfg-frame">
+  <div class="box cfg-box">
     <div class="border">
         <div id="cfgviz"><svg><g></g></svg></div>
     </div>

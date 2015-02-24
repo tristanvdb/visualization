@@ -3,13 +3,9 @@ var editor = ace.edit("editor");
 editor.setReadOnly(true);
 editor.$blockScrolling = Infinity;
 
-//function makeAsmViz(filename, callback) {
-//  $.post("./call-asm-viz.php", { filename: filename }).done(callback);
-//}
-
 function traverseASM_CG(cg, graph) {
   var rtn_select = document.getElementById("routine");
-  while (rtn_select.options.length > 0) rtn_select.remove(0);
+  while (rtn_select.options.length > 0) rtn_select.remove(0); // remove current options
 
   cg.routines.forEach(function (rtn) {
     if (rtn.type=="idapro" || rtn.type=="ours" || rtn.type=="user") {
@@ -38,7 +34,7 @@ function traverseASM_CFG(cfg, graph) {
       stop++;
     });
 
-    console.log("label: " + blk.label + ", start=" + start + ", stop=" + stop);
+//  console.log("label: " + blk.label + ", start=" + start + ", stop=" + stop);
     graph.setNode(blk.tag, { "label": blk.label, "start": start, "stop": stop });
 
     if (blk.out_true != "" && blk.out_false != "") {
@@ -54,14 +50,19 @@ function traverseASM_CFG(cfg, graph) {
 }
 
 function generate_cg(file) {
-  d3.select("#cgviz").html("<svg><g></g></svg>");
-  d3.select("#cfgviz").html("<svg><g></g></svg>");
+  var cgviz = d3.select("#cgviz");
+  var cfgviz = d3.select("#cfgviz");
+
+  cgviz.html("<svg><g></g></svg>");  // Erase CG Viz
+  cfgviz.html("<svg><g></g></svg>"); // Erase CFG Viz
+
+  // Reset editor
   editor.setValue("");
+  editor.selection.removeListener("changeCursor");
 
   dumpFile("../../media/ssd/projects/drafts/asm-to-graphs/tests/" + file + "/" + file + "-no-block.json", function (content) {
-    var graph = render_JSON(content, "cgviz", traverseASM_CG, set_max_hw_margin);
-
-    var cgviz = d3.select("#cgviz");
+    var graph_cg = render_JSON(content, "cgviz", traverseASM_CG);
+    var zoom_cg = set_zoom(cgviz, set_max_hw_margin(cfgviz, graph_cg.graph()));
 
     cgviz.selectAll(".is-idapro").on('click', function () {
       generate_cfg(file, d3.select(this).datum());
@@ -78,44 +79,22 @@ function generate_cg(file) {
   });
 }
 
-function set_margin_cfg(viz, graph) {
-  var margin = 20;
-  var height_ratio = viz.node().getBoundingClientRect().height / (graph.height + 2 * margin + 100);
-
-  var scale = height_ratio;
-  var hmargin = margin;
-  var vmargin = (viz.node().getBoundingClientRect().height - scale * (graph.height  + 2 * margin + 100))/2;
-
-  return {"hmargin":hmargin, "vmargin":vmargin, "scale":scale};
-}
-
+var graph_cfg;
 var zoom_cfg;
 
-function set_zoom_cfg(viz, zoom_init) {
-  var svg = viz.select("svg");
-  var svg_inner_graph = svg.select("g");
-
-  zoom_cfg = d3.behavior.zoom().on("zoom", function() {
-    svg_inner_graph.attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
-  });
-  svg.call(zoom_cfg);
-
-  zoom_cfg.translate([zoom_init.hmargin, zoom_init.vmargin])
-          .scale(zoom_init.scale)
-          .event(svg);
-}
-
-var graph_cfg;
-
 function generate_cfg(file, routine) {
-  d3.select("#cfgviz").html("<svg><g></g></svg>");
+  var cfgviz = d3.select("#cfgviz");
+
+  cfgviz.html("<svg><g></g></svg>"); // Erase CFG Viz
+
+  // Reset editor
   editor.setValue("");
   editor.selection.removeListener("changeCursor");
 
   dumpFile("../../media/ssd/projects/drafts/asm-to-graphs/tests/" + file + "/" + file + "-" + routine + ".json", function (content) {
-    graph_cfg = render_JSON(content, "cfgviz", traverseASM_CFG, set_margin_cfg, set_zoom_cfg);
+    graph_cfg = render_JSON(content, "cfgviz", traverseASM_CFG);
 
-    var cfgviz = d3.select("#cfgviz");
+    zoom_cfg = set_zoom(cfgviz, set_w_margin(cfgviz, graph_cfg.graph()));
 
     cfgviz.selectAll(".node").on('click', function () {
       editor.gotoLine(graph_cfg.node(d3.select(this).datum()).start+1, 0, true);
@@ -125,39 +104,29 @@ function generate_cfg(file, routine) {
 
     editor.selection.on("changeCursor", function () {
       var line = editor.selection.getCursor().row;
-      console.log("Cursor on line: " + line);
+//    console.log("Cursor on line: " + line);
   
       cfgviz.selectAll(".node").forEach(function (a) { a.forEach(function (n) {
         if (line >= graph_cfg.node(n.__data__).start && line <= graph_cfg.node(n.__data__).stop) {
-
           n.style.fill = "#FF0000";
 
+          // Reset position and scale
           zoom_cfg.translate([0, 0]).scale(1).event(cfgviz.select("svg"));
 
+          // getBoundingClientRect: return position relative to the window
+          //  get position of the viz div
           var viz_box = cfgviz.node().getBoundingClientRect();
           var v_w = viz_box.width;
           var v_h = viz_box.height;
-          console.log("v_w=" + v_w + ", v_h=" + v_h);
-
+          //  get position of the center of the node (relative to window) and compute position in the viz div
           var rect = n.getBoundingClientRect();
-          console.log("rect.x=" + rect.x + ", rect.width=" + rect.width);
-          console.log("rect.y=" + rect.y + ", rect.height=" + rect.height);
-
           var x = rect.x + rect.width / 2 - viz_box.x;
           var y = rect.y + rect.height / 2 - viz_box.y;
-          console.log("x=" + x + ", y=" + y);
-
-          var g_w = graph_cfg.graph().width;
-          var g_h = graph_cfg.graph().height;
-          console.log("g_w=" + g_w + ", g_h=" + g_h);
-
-          cfgviz.select("svg").select("g");
-
+          // Figure out the translation to center the node in viz div
           var t_x = (v_w/2 - x);
           var t_y = (v_h/2 - y);
 
-          console.log("move: [" + t_x + ", " + t_y + "]");
-
+          // move the graph to computed position
           zoom_cfg.translate([t_x, t_y]).scale(1).event(cfgviz.select("svg"));
 
         }
@@ -165,6 +134,14 @@ function generate_cfg(file, routine) {
           n.style.fill = "#000000";
         }
       })});
+
+      cfgviz.selectAll(".edgePath").style({opacity:'.4'});
+
+//    cfgviz.selectAll(".path").on('mouseover', function(d) { d3.select(this).style({opacity:'1' });  })
+//    cfgviz.selectAll(".path").on('mouseout',  function(d) { d3.select(this).style({opacity:'.4'}); });
+
+      cfgviz.selectAll(".path").on('mouseover', function(d) { console.log("mouseover"); })
+      cfgviz.selectAll(".path").on('mouseout',  function(d) { console.log("mouseout"); });
     });
   });
 }

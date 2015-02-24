@@ -2,72 +2,72 @@
 // Whole graph is visible
 function set_max_hw_margin(viz, graph) {
   var margin = 20;
-  var width_ratio  = viz.node().getBoundingClientRect().width  / (graph.width  + 2 * margin + 100);
-  var height_ratio = viz.node().getBoundingClientRect().height / (graph.height + 2 * margin + 100);
+  var width_ratio  = viz.node().getBoundingClientRect().width  / (graph.width  + 2 * margin);
+  var height_ratio = viz.node().getBoundingClientRect().height / (graph.height + 2 * margin);
 
   var scale = 1;
   var hmargin = 0;
-  var vmargin = 0;
+  var wmargin = 0;
   if (width_ratio < height_ratio) {
     scale = width_ratio;
-    hmargin = margin;
-    vmargin = (viz.node().getBoundingClientRect().height - scale * (graph.height  + 2 * margin + 100))/2;
+    hmargin = (viz.node().getBoundingClientRect().height - scale * (graph.height  + 2 * margin))/2;
+    wmargin = margin;
   }
   else {
     scale = height_ratio;
-    hmargin = (viz.node().getBoundingClientRect().width - scale * (graph.width  + 2 * margin + 100))/2;
-    vmargin = margin;
+    hmargin = margin;
+    wmargin = (viz.node().getBoundingClientRect().width - scale * (graph.width  + 2 * margin))/2;
   }
 
-  return {"hmargin":hmargin, "vmargin":vmargin, "scale":scale};
+  return {"hmargin":hmargin, "wmargin":wmargin, "scale":scale};
 }
 
 // Smallest dimension is visible
 function set_min_hw_margin(viz, graph) {
   var margin = 20;
-  var width_ratio  = viz.node().getBoundingClientRect().width  / (graph.width  + 2 * margin + 100);
-  var height_ratio = viz.node().getBoundingClientRect().height / (graph.height + 2 * margin + 100);
+  var width_ratio  = viz.node().getBoundingClientRect().width  / (graph.width  + 2 * margin);
+  var height_ratio = viz.node().getBoundingClientRect().height / (graph.height + 2 * margin);
 
   var scale = 1;
   var hmargin = 0;
-  var vmargin = 0;
+  var wmargin = 0;
   if (width_ratio > height_ratio) {
     scale = width_ratio;
-    hmargin = margin;
-    vmargin = (viz.node().getBoundingClientRect().height - scale * (graph.height  + 2 * margin + 100))/2;
+    hmargin = (viz.node().getBoundingClientRect().height - scale * (graph.height  + 2 * margin))/2;
+    wmargin = margin;
   }
   else {
     scale = height_ratio;
-    hmargin = (viz.node().getBoundingClientRect().width - scale * (graph.width  + 2 * margin + 100))/2;
-    vmargin = margin;
+    hmargin = margin;
+    wmargin = (viz.node().getBoundingClientRect().width - scale * (graph.width  + 2 * margin))/2;
   }
 
-  return {"hmargin":hmargin, "vmargin":vmargin, "scale":scale};
+  return {"hmargin":hmargin, "wmargin":wmargin, "scale":scale};
 }
 
 function set_h_margin(viz, graph) {
   var margin = 20;
-  var height_ratio = viz.node().getBoundingClientRect().height / (graph.height + 2 * margin + 100);
+  var height_ratio = viz.node().getBoundingClientRect().height / (graph.height + 2 * margin);
 
   var scale = height_ratio;
-  var hmargin = (viz.node().getBoundingClientRect().width - scale * (graph.width  + 2 * margin + 100))/2;
-  var vmargin = margin;
+  var hmargin = margin;
+  var wmargin = (viz.node().getBoundingClientRect().width - scale * (graph.width  + 2 * margin))/2;
 
-  return {"hmargin":hmargin, "vmargin":vmargin, "scale":scale};
+  return {"hmargin":hmargin, "wmargin":wmargin, "scale":scale};
 }
 
 function set_w_margin(viz, graph) {
   var margin = 20;
-  var width_ratio  = viz.node().getBoundingClientRect().width  / (graph.width  + 2 * margin + 100);
+  var width_ratio  = viz.node().getBoundingClientRect().width  / (graph.width  + 2 * margin);
 
   var scale = width_ratio;
-  var hmargin = margin;
-  var vmargin = (viz.node().getBoundingClientRect().height - scale * (graph.height  + 2 * margin + 100))/2;
+  var hmargin = (viz.node().getBoundingClientRect().height - scale * (graph.height  + 2 * margin))/2;
+  var wmargin = margin;
 
-  return {"hmargin":hmargin, "vmargin":vmargin, "scale":scale};
+  return {"hmargin":hmargin, "wmargin":wmargin, "scale":scale};
 }
 
-function default_set_zoom(viz, zoom_init) {
+function set_zoom(viz, zoom_init) {
   var svg = viz.select("svg");
   var svg_inner_graph = svg.select("g");
 
@@ -76,14 +76,14 @@ function default_set_zoom(viz, zoom_init) {
   });
   svg.call(zoom);
 
-  zoom.translate([zoom_init.hmargin, zoom_init.vmargin])
+  zoom.translate([zoom_init.hmargin, zoom_init.wmargin])
       .scale(zoom_init.scale)
       .event(svg);
+
+  return zoom;
 }
 
-function render_JSON(text, selector, graph_builder, set_margin, set_zoom) {
-  if (!set_margin) set_margin = set_max_hw_margin;
-  if (!set_zoom) set_zoom = default_set_zoom;
+function render_JSON(text, selector, graph_builder) {
 
   // Process input into a graph
 
@@ -102,8 +102,6 @@ function render_JSON(text, selector, graph_builder, set_margin, set_zoom) {
   // Render the graph
   var render = new dagreD3.render();
   render(svg_inner_graph, out_graph);
-
-  set_zoom(viz, set_margin(viz, out_graph.graph()));
 
   return out_graph;
 }

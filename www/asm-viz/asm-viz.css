@@ -7,13 +7,15 @@
 .row     { width: 100%; display: block; }
 
 .cmd-frame { height: 3em; }
-.cmd-box   { width: calc(33% - 15px); }
+.cmd-box-1 { width: calc(30% - 15px); }
+.cmd-box-2 { width: calc(25% - 15px); }
+.cmd-box-3 { width: calc(45% - 15px); }
 
 .pan-frame { height: 20em; }
-.cg-box    { width: calc(75% - 15px); }
-.edit-box  { width: calc(25% - 15px); }
+.cg-box    { width: calc(70% - 15px); }
+.edit-box  { width: calc(30% - 15px); }
 
-.cfg-frame { height: 15em; }
+.cfg-frame { height: 20em; }
 .cfg-box   { width: calc(100% - 15px);  }
 
 .dbg-frame { height: 10em; }
@@ -28,6 +30,6 @@
 
 .edgePath path {
   stroke: #333;
-  stroke-width: 1.5px;
+  stroke-width: 2px;
 }
 
